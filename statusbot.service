@@ -1,0 +1,14 @@
+[Unit]
+Description=Discord statusbot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=%h/discord-status-bot
+EnvironmentFile=%h/discord-status-bot/.env
+ExecStart=%h/discord-status-bot/.venv/bin/python bot.py
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target

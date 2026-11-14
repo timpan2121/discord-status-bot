@@ -1,0 +1,395 @@
+# Statusbot-konfiguration
+# Webhook: Discord-kanal -> Redigera kanal -> Integrationer -> Webhooks -> Ny webhook -> Kopiera URL.
+# Lägg den helst i miljövariabeln DISCORD_WEBHOOK_URL istället för här.
+
+interval = 120                 # standardintervall (sek) per källa
+announce_open_on_start = true  # posta pågående incidenter vid första start
+
+[language]
+# Översättning av incidenttexter till svenska:
+#  "auto" = DeepL om DEEPL_API_KEY finns i .env (bäst, gratis 500k tecken/mån), annars MyMemory (gratis, ingen nyckel)
+#  "off"  = behåll originalspråket (statusord översätts ändå)
+translate = "auto"
+
+[discord]
+webhook_url = ""
+mention = ""                   # t.ex. "<@&ROLL_ID>" för att pinga en roll
+
+# ---------------- Microsoft ----------------
+[source.m365]
+category = "Microsoft"
+page = "https://status.cloud.microsoft/"
+name = "Microsoft 365"
+type = "m365public"            # publika status.cloud.microsoft, ingen inloggning
+service = "m365Consumer"
+interval = 60
+
+[source.m365admin]
+category = "Microsoft"
+page = "https://status.cloud.microsoft/"
+name = "Microsoft 365 Admin Center"
+type = "rss"
+url = "https://status.office365.com/api/feed/mac"
+
+[source.azure]
+category = "Microsoft"
+page = "https://azure.status.microsoft/en-us/status/"
+name = "Azure"
+type = "rss"
+url = "https://azure.status.microsoft/en-us/status/feed/"
+
+# Detaljerad M365 Service Health för er tenant (Exchange, Teams, SharePoint, Intune…)
+# Kräver Entra-app med Application-behörighet ServiceHealth.Read.All + admin consent.
+# Sätt env: MS_TENANT_ID, MS_CLIENT_ID, MS_CLIENT_SECRET
+[source.m365tenant]
+category = "Microsoft"
+page = "https://admin.microsoft.com/#/servicehealth"
+name = "Microsoft 365 (tenant)"
+type = "msgraph"
+enabled = false
+include_advisories = true
+
+# ---------------- Moln / infrastruktur ----------------
+[source.cloudflare]
+category = "Moln & infrastruktur"
+name = "Cloudflare"
+type = "statuspage"
+url = "https://www.cloudflarestatus.com"
+
+[source.aws]
+category = "Moln & infrastruktur"
+page = "https://health.aws.amazon.com/health/status"
+name = "AWS"
+type = "rss"
+url = "https://status.aws.amazon.com/rss/all.rss"
+enabled = false   # mycket brusigt, slå på vid behov
+
+
+# ---------------- Google ----------------
+[source.google_gmail]
+category = "Google"
+name = "Gmail"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Gmail"]
+
+[source.google_drive]
+category = "Google"
+name = "Google Drive"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Google Drive"]
+
+[source.google_meet]
+category = "Google"
+name = "Google Meet"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Google Meet"]
+
+[source.google_calendar]
+category = "Google"
+name = "Google Kalender"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Google Calendar"]
+
+[source.google_docs]
+category = "Google"
+name = "Docs, Kalkylark & Presentationer"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Google Docs", "Google Sheets", "Google Slides", "Google Forms"]
+
+[source.google_chat]
+category = "Google"
+name = "Google Chat"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Google Chat"]
+
+[source.google_gemini]
+category = "Google"
+name = "Gemini"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Gemini", "Gemini Notebook"]
+
+[source.google_signin]
+category = "Google"
+name = "Google-inloggning"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Google Sign In"]
+
+[source.google_admin]
+category = "Google"
+name = "Admin Console"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+products = ["Admin Console"]
+
+[source.google_workspace]
+category = "Google"
+name = "Övriga Workspace-tjänster"
+type = "google"
+url = "https://www.google.com/appsstatus/dashboard/incidents.json"
+page = "https://www.google.com/appsstatus/dashboard/"
+exclude_products = ["Admin Console", "Gemini", "Gemini Notebook", "Gmail", "Google Calendar", "Google Chat", "Google Docs", "Google Drive", "Google Forms", "Google Meet", "Google Sheets", "Google Sign In", "Google Slides"]
+
+[source.google_cloud]
+category = "Google"
+name = "Google Cloud"
+type = "google"
+url = "https://status.cloud.google.com/incidents.json"
+page = "https://status.cloud.google.com/"
+
+# ---------------- Vanliga appar ----------------
+[source.discord]
+category = "Appar & tjänster"
+name = "Discord"
+type = "statuspage"
+url = "https://discordstatus.com"
+
+[source.zoom]
+category = "Appar & tjänster"
+name = "Zoom"
+type = "statuspage"
+url = "https://status.zoom.us"
+
+[source.slack]
+category = "Appar & tjänster"
+page = "https://slack-status.com/"
+name = "Slack"
+type = "slack"
+
+[source.zoho_mail]
+category = "Appar & tjänster"
+name = "Zoho Mail"
+type = "statusiq"
+url = "https://eu.zohostatus.com"   # EU-datacentret; byt till https://us.zohostatus.com vid behov
+match = ["Zoho Mail"]
+
+[source.freshdesk]
+category = "Appar & tjänster"
+name = "Freshdesk"
+type = "freshstatus"
+account_id = 3611
+page = "https://freshdesk.freshstatus.io/"
+
+[source.dropbox]
+category = "Appar & tjänster"
+name = "Dropbox"
+type = "statuspage"
+url = "https://status.dropbox.com"
+
+[source.github]
+category = "Appar & tjänster"
+name = "GitHub"
+type = "statuspage"
+url = "https://www.githubstatus.com"
+
+[source.openai]
+category = "Appar & tjänster"
+name = "OpenAI / ChatGPT"
+type = "statuspage"
+url = "https://status.openai.com"
+
+[source.fortnox]
+category = "Appar & tjänster"
+name = "Fortnox"
+type = "statuspage"
+url = "https://status.fortnox.se"
+
+[source.bankid]
+category = "Banker & betalningar"
+name = "BankID"
+type = "statuspage"
+url = "https://status.bankid.com"
+
+[source.atlassian]
+category = "Appar & tjänster"
+name = "Atlassian (Jira/Confluence)"
+type = "statuspage"
+url = "https://status.atlassian.com"
+enabled = false
+
+# ---------------- Banker & betalningar ----------------
+[source.swish]
+category = "Banker & betalningar"
+name = "Swish"
+type = "statuspage"
+url = "https://status.swish.nu"
+
+[source.klarna]
+category = "Banker & betalningar"
+name = "Klarna"
+type = "statuspage"
+url = "https://status.klarna.com"
+
+[source.tink]
+category = "Banker & betalningar"
+name = "Tink (bankkopplingar)"
+type = "statuspage"
+url = "https://status.tink.com"
+
+# Bankernas status hämtas från Swish statussida, som rapporterar varje anslutet bank separat.
+# En störning här betyder att Swish (och ofta bankens app/internetbank) har problem.
+
+[source.bank_swedbank]
+page = "https://www.swedbank.se/privat/betala-och-overfora/driftinformation-betaltjanster.html"
+category = "Banker & betalningar"
+name = "Swedbank"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Swedbank"
+via = " (Swish)"
+
+[source.bank_handelsbanken]
+category = "Banker & betalningar"
+name = "Handelsbanken"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Handelsbanken"
+via = " (Swish)"
+
+[source.bank_seb]
+category = "Banker & betalningar"
+name = "SEB"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "SEB"
+via = " (Swish)"
+
+[source.bank_nordea]
+category = "Banker & betalningar"
+name = "Nordea"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Nordea"
+via = " (Swish)"
+
+[source.bank_danske_bank]
+category = "Banker & betalningar"
+name = "Danske Bank"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Danske Bank"
+via = " (Swish)"
+
+[source.bank_lansforsakringar]
+category = "Banker & betalningar"
+name = "Länsförsäkringar"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Länsförsäkringar"
+via = " (Swish)"
+
+[source.bank_ica_banken]
+category = "Banker & betalningar"
+name = "ICA Banken"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "ICA Banken"
+via = " (Swish)"
+
+[source.bank_skandiabanken]
+category = "Banker & betalningar"
+name = "Skandiabanken"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Skandiabanken"
+via = " (Swish)"
+
+[source.bank_sparbanken_syd]
+page = "https://www.swedbank.se/privat/betala-och-overfora/driftinformation-betaltjanster.html"
+category = "Banker & betalningar"
+name = "Sparbanken Syd"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Sparbanken Syd"
+via = " (Swish)"
+
+[source.bank_klarna_bank]
+category = "Banker & betalningar"
+name = "Klarna Bank"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Klarna Bank"
+via = " (Swish)"
+
+[source.bank_marginalen_bank]
+category = "Banker & betalningar"
+name = "Marginalen Bank"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Marginalen Bank"
+via = " (Swish)"
+
+[source.bank_svea_bank]
+category = "Banker & betalningar"
+name = "Svea Bank"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Svea Bank"
+via = " (Swish)"
+
+[source.bank_alandsbanken]
+category = "Banker & betalningar"
+name = "Ålandsbanken"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Ålandsbanken"
+via = " (Swish)"
+
+[source.bank_lunar]
+category = "Banker & betalningar"
+name = "Lunar"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Lunar"
+via = " (Swish)"
+
+[source.bank_northmill_bank]
+category = "Banker & betalningar"
+name = "Northmill Bank"
+type = "statuspage_component"
+url = "https://status.swish.nu"
+component = "Northmill Bank"
+via = " (Swish)"
+
+# ---------------- Svenska bredbandsleverantörer ----------------
+# De visar störningar per adress via JavaScript-kartor och har inga öppna API:er,
+# så de visas som länkar (🔗) i översikten men postar inga notiser.
+[source.telia]
+category = "Bredband (Sverige)"
+name = "Telia"
+type = "link"
+url = "https://www.telia.se/privat/support/driftinformation"
+
+[source.tele2]
+category = "Bredband (Sverige)"
+name = "Tele2 / Com Hem"
+type = "link"
+url = "https://www.tele2.se/kundservice/driftstorningar"
+
+[source.telenor]
+category = "Bredband (Sverige)"
+name = "Telenor"
+type = "link"
+url = "https://www.telenor.se/support/driftinformation/"
+
+[source.bahnhof]
+category = "Bredband (Sverige)"
+name = "Bahnhof"
+type = "link"
+url = "https://bahnhof.se/kundservice/driftinfo"
