@@ -211,7 +211,9 @@ def src_rss(cfg: dict) -> list[Incident]:
         resolved = any(w in low for w in ("resolved", "mitigated", "åtgärdat", "löst"))
         out.append(Incident(uid=uid, title=clean(title, 250), status="resolved" if resolved else "reported",
                             severity="resolved" if resolved else "major", url=link,
-                            body=clean(body), updated=upd, resolved=resolved))
+                            body=clean(body), resolved=resolved,
+                            # signatur på innehållet, inte datum: vissa flöden byter datum vid varje hämtning
+                            updated=hashlib.sha1(f"{title}|{body}".encode()).hexdigest()))
     return out
 
 

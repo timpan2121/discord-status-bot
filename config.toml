@@ -24,13 +24,6 @@ type = "m365public"            # publika status.cloud.microsoft, ingen inloggnin
 service = "m365Consumer"
 interval = 60
 
-[source.m365admin]
-category = "Microsoft"
-page = "https://status.cloud.microsoft/"
-name = "Microsoft 365 Admin Center"
-type = "rss"
-url = "https://status.office365.com/api/feed/mac"
-
 [source.azure]
 category = "Microsoft"
 page = "https://azure.status.microsoft/en-us/status/"
