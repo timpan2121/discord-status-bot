@@ -672,6 +672,183 @@ urls = ["https://www.atg.se/"]
 page = "https://www.atg.se/"
 interval = 300
 
+# ---------------- Ännu fler (nåbarhetskontroll) ----------------
+[source.http_avanza]
+category = "Internetbanker"
+name = "Avanza"
+type = "http"
+urls = ["https://www.avanza.se/"]
+page = "https://www.avanza.se/"
+interval = 300
+
+[source.http_nordnet]
+category = "Internetbanker"
+name = "Nordnet"
+type = "http"
+urls = ["https://www.nordnet.se/"]
+page = "https://www.nordnet.se/"
+interval = 300
+
+[source.http_sbab]
+category = "Internetbanker"
+name = "SBAB"
+type = "http"
+urls = ["https://www.sbab.se/"]
+page = "https://www.sbab.se/"
+interval = 300
+
+[source.http_skandia]
+category = "Internetbanker"
+name = "Skandia"
+type = "http"
+urls = ["https://www.skandia.se/"]
+page = "https://www.skandia.se/"
+interval = 300
+
+[source.http_sparbanken]
+category = "Internetbanker"
+name = "Sparbanken Syd"
+type = "http"
+urls = ["https://www.sparbankensyd.se/"]
+page = "https://www.sparbankensyd.se/"
+interval = 300
+
+[source.http_marginalen]
+category = "Internetbanker"
+name = "Marginalen Bank"
+type = "http"
+urls = ["https://www.marginalen.se/"]
+page = "https://www.marginalen.se/"
+interval = 300
+
+[source.http_resurs]
+category = "Internetbanker"
+name = "Resurs Bank"
+type = "http"
+urls = ["https://www.resursbank.se/"]
+page = "https://www.resursbank.se/"
+interval = 300
+
+[source.http_ikano]
+category = "Internetbanker"
+name = "Ikano Bank"
+type = "http"
+urls = ["https://ikanobank.se/"]
+page = "https://ikanobank.se/"
+interval = 300
+
+[source.http_svea]
+category = "Internetbanker"
+name = "Svea Bank"
+type = "http"
+urls = ["https://www.svea.com/"]
+page = "https://www.svea.com/"
+interval = 300
+
+[source.http_collector]
+category = "Internetbanker"
+name = "Collector Bank"
+type = "http"
+urls = ["https://www.collector.se/"]
+page = "https://www.collector.se/"
+interval = 300
+
+[source.http_lunar]
+category = "Internetbanker"
+name = "Lunar"
+type = "http"
+urls = ["https://www.lunar.app/"]
+page = "https://www.lunar.app/"
+interval = 300
+
+[source.http_northmill]
+category = "Internetbanker"
+name = "Northmill"
+type = "http"
+urls = ["https://www.northmill.se/"]
+page = "https://www.northmill.se/"
+interval = 300
+
+[source.http_hemnet]
+category = "Handla & spel"
+name = "Hemnet"
+type = "http"
+urls = ["https://www.hemnet.se/"]
+page = "https://www.hemnet.se/"
+interval = 300
+
+[source.http_amazon]
+category = "Handla & spel"
+name = "Amazon.se"
+type = "http"
+urls = ["https://www.amazon.se/"]
+page = "https://www.amazon.se/"
+interval = 300
+
+[source.http_adlibris]
+category = "Handla & spel"
+name = "Adlibris"
+type = "http"
+urls = ["https://www.adlibris.com/"]
+page = "https://www.adlibris.com/"
+interval = 300
+
+[source.http_bokus]
+category = "Handla & spel"
+name = "Bokus"
+type = "http"
+urls = ["https://www.bokus.com/"]
+page = "https://www.bokus.com/"
+interval = 300
+
+[source.http_prisjakt]
+category = "Handla & spel"
+name = "Prisjakt"
+type = "http"
+urls = ["https://www.prisjakt.nu/"]
+page = "https://www.prisjakt.nu/"
+interval = 300
+
+[source.http_postkod]
+category = "Handla & spel"
+name = "Postkodlotteriet"
+type = "http"
+urls = ["https://www.postkodlotteriet.se/"]
+page = "https://www.postkodlotteriet.se/"
+interval = 300
+
+[source.http_elgiganten]
+category = "Handla & spel"
+name = "Elgiganten"
+type = "http"
+urls = ["https://www.elgiganten.se/"]
+page = "https://www.elgiganten.se/"
+interval = 300
+
+[source.http_ikea]
+category = "Handla & spel"
+name = "IKEA"
+type = "http"
+urls = ["https://www.ikea.com/se/"]
+page = "https://www.ikea.com/se/"
+interval = 300
+
+[source.http_web1177]
+category = "Vardagsappar"
+name = "1177.se (webbplats)"
+type = "http"
+urls = ["https://www.1177.se/"]
+page = "https://www.1177.se/"
+interval = 300
+
+[source.http_outlook]
+category = "Vardagsappar"
+name = "Outlook.com / Hotmail"
+type = "http"
+urls = ["https://outlook.live.com/"]
+page = "https://outlook.live.com/"
+interval = 300
+
 # ---------------- Spel ----------------
 [source.twitch]
 category = "Spel"
