@@ -413,6 +413,30 @@ def src_statuspage_component(cfg: dict) -> list[Incident]:
         resolved=ok)]
 
 
+def src_apple(cfg: dict) -> list[Incident]:
+    """Apples systemstatus. `services` = lista med tjänstenamn eller prefix (t.ex. "iCloud")."""
+    t = get("https://www.apple.com/support/systemstatus/data/system_status_en_US.js").text
+    data = json.loads(t[t.index("{"): t.rindex("}") + 1])
+    want = [w.lower() for w in cfg.get("services", [])]
+    out = []
+    for svc in data.get("services", []):
+        name = svc.get("serviceName", "")
+        if want and not any(name.lower().startswith(w) for w in want):
+            continue
+        for ev in svc.get("events", []):
+            resolved = ev.get("eventStatus") in ("resolved", "completed")
+            typ = (ev.get("statusType") or "").lower()
+            sev = "resolved" if resolved else ("maintenance" if "maint" in typ else
+                                               "critical" if typ == "outage" else "minor")
+            out.append(Incident(
+                uid=f"{name}|{ev.get('messageId')}", title=f"{name}: {ev.get('message', '')}",
+                status=ev.get("eventStatus", "?"), severity=sev,
+                url="https://www.apple.com/se/support/systemstatus/",
+                body=clean(f"{ev.get('usersAffected') or ''}"), components=[name],
+                updated=f"{ev.get('eventStatus')}|{ev.get('datePosted')}", resolved=resolved))
+    return out
+
+
 def src_link(cfg: dict) -> list[Incident]:
     """Bara en länk i översikten (sidor som kräver adress/JS). Pollas inte, postar aldrig."""
     return []
@@ -439,7 +463,7 @@ def src_m365public(cfg: dict) -> list[Incident]:
     return out
 
 
-SOURCES = {"link": src_link, "statuspage_component": src_statuspage_component, "freshstatus": src_freshstatus, "statusiq": src_statusiq, "m365public": src_m365public, "statuspage": src_statuspage, "rss": src_rss, "google": src_google,
+SOURCES = {"link": src_link, "apple": src_apple, "statuspage_component": src_statuspage_component, "freshstatus": src_freshstatus, "statusiq": src_statusiq, "m365public": src_m365public, "statuspage": src_statuspage, "rss": src_rss, "google": src_google,
            "slack": src_slack, "msgraph": src_msgraph, "webpage": src_webpage}
 
 
@@ -575,7 +599,7 @@ def snapshot(conf: dict, state: dict) -> dict:
 
 SEV_ICON = {"critical": "🔴", "major": "🟠", "minor": "🟡", "info": "🟡", "maintenance": "🔧"}
 SEV_RANK = {"critical": 4, "major": 3, "minor": 2, "info": 2, "maintenance": 1}
-CAT_ORDER = ["Microsoft", "Google", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
+CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
 
 
 def _svc_view(s: dict) -> tuple[str, str, int]:

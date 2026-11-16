@@ -216,7 +216,56 @@ type = "statuspage"
 url = "https://status.atlassian.com"
 enabled = false
 
+# ---------------- Vardagsappar ----------------
+[source.apple_icloud]
+category = "Vardagsappar"
+name = "iCloud (bilder, mejl, backup)"
+type = "apple"
+page = "https://www.apple.com/se/support/systemstatus/"
+services = ["iCloud"]
+
+[source.apple_imessage]
+category = "Vardagsappar"
+name = "iMessage & FaceTime"
+type = "apple"
+page = "https://www.apple.com/se/support/systemstatus/"
+services = ["iMessage", "FaceTime"]
+
+[source.apple_pay]
+category = "Vardagsappar"
+name = "Apple Pay & Wallet"
+type = "apple"
+page = "https://www.apple.com/se/support/systemstatus/"
+services = ["Apple Pay", "Apple Cash", "Wallet"]
+
+[source.apple_appstore]
+category = "Vardagsappar"
+name = "App Store"
+type = "apple"
+page = "https://www.apple.com/se/support/systemstatus/"
+services = ["App Store"]
+
+[source.apple_findmy]
+category = "Vardagsappar"
+name = "Hitta (Find My)"
+type = "apple"
+page = "https://www.apple.com/se/support/systemstatus/"
+services = ["Find My"]
+
+[source.apple_account]
+category = "Vardagsappar"
+name = "Apple-konto (inloggning)"
+type = "apple"
+page = "https://www.apple.com/se/support/systemstatus/"
+services = ["Apple Account"]
+
 # ---------------- Banker & betalningar ----------------
+[source.vipps_mobilepay]
+category = "Banker & betalningar"
+name = "Vipps MobilePay"
+type = "statuspage"
+url = "https://status.vippsmobilepay.com"
+
 [source.swish]
 category = "Banker & betalningar"
 name = "Swish"
