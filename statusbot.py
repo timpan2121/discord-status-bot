@@ -724,7 +724,7 @@ def snapshot(conf: dict, state: dict) -> dict:
 
 SEV_ICON = {"critical": "🔴", "major": "🟠", "minor": "🟡", "info": "🟡", "maintenance": "🔧"}
 SEV_RANK = {"critical": 4, "major": 3, "minor": 2, "info": 2, "maintenance": 1}
-CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Strömning & sociala medier", "Spel", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
+CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Vård & apotek", "Myndigheter", "Strömning & sociala medier", "Nyheter, radio & ljudböcker", "Handla & spel", "Spel", "Internetbanker", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
 
 
 def _svc_view(s: dict) -> tuple[str, str, int]:
@@ -744,17 +744,19 @@ def _svc_view(s: dict) -> tuple[str, str, int]:
     return "🟢", "Fungerar", 0
 
 
-def overview_embeds(snap: dict) -> list[dict]:
+def overview_embeds(snap: dict, title: str = "📡 Driftstatus – översikt", cats_filter: list | None = None) -> list[dict]:
     """Översikt + (om något krånglar) lista med länkar till varje pågående störning."""
-    rows = [(s, *_svc_view(s)) for s in snap["services"]]
+    rows = [(s, *_svc_view(s)) for s in snap["services"]
+            if cats_filter is None or s["category"] in cats_filter]
     worst = max((r[3] for r in rows), default=0)
     bad = [r for r in rows if r[0]["open"]]
     colors = [0x2ECC71, 0x3498DB, 0xF1C40F, 0xE67E22, 0xE74C3C]
     lnk = lambda n, u: f"[{n}]({u})" if u.startswith("http") else n
-    e = {"title": "📡 Driftstatus – översikt", "color": colors[worst], "fields": [],
+    e = {"title": title, "color": colors[worst], "fields": [],
          "description": f"**{'⚠️ Störningar hos %d av %d tjänster' % (len(bad), len(rows)) if bad else '✅ Alla tjänster fungerar'}**",
          "footer": {"text": "🟢 OK  🟡 mindre  🟠 större  🔴 kritisk  🔧 underhåll  🔗 driftkarta  ⚪ okänt"}}
-    cats = sorted({r[0]["category"] for r in rows}, key=lambda c: CAT_ORDER.index(c) if c in CAT_ORDER else 99)
+    order = cats_filter or CAT_ORDER
+    cats = sorted({r[0]["category"] for r in rows}, key=lambda c: order.index(c) if c in order else 99)
     for c in cats:
         lines = [f"{ic} {lnk(s['name'], s['url'])}" + ("" if ic == "🟢" else f" – *{lb}*")
                  for s, ic, lb, rk in sorted((r for r in rows if r[0]["category"] == c), key=lambda r: (-r[3], r[0]["name"]))]
@@ -784,28 +786,45 @@ def overview_embeds(snap: dict) -> list[dict]:
     return out
 
 
+def _overview_groups(conf: dict, snap: dict) -> list[tuple[str, str, list | None]]:
+    groups = conf.get("discord", {}).get("overview_groups")
+    if not groups:
+        return [("main", "📡 Driftstatus – översikt", None)]
+    out, used = [], set()
+    for i, g in enumerate(groups):
+        out.append((f"g{i}", g["title"], list(g["categories"])))
+        used |= set(g["categories"])
+    rest = sorted({s["category"] for s in snap["services"]} - used)
+    if rest:  # kategorier som inte nämns hamnar i sista gruppen
+        out[-1][2].extend(rest)
+    return out
+
+
 def update_overview(webhook: str, conf: dict, state: dict) -> None:
-    """Redigera översiktsmeddelandet (skapa det om det saknas). Bara när något ändrats eller var 30:e min."""
+    """Redigera översiktsmeddelandena (skapa dem om de saknas). Bara när något ändrats eller var 30:e min."""
     snap = snapshot(conf, state)
-    embeds = overview_embeds(snap)
-    sig = hashlib.sha1(json.dumps([[ (s["name"], _svc_view(s)[0], [o["title"] for o in s["open"]]) for s in snap["services"]]],
-                                  ensure_ascii=False).encode()).hexdigest()
-    ov = state.setdefault("_overview", {})
-    if ov.get("sig") == sig and time.time() - ov.get("ts", 0) < 1800 and ov.get("msg"):
-        return
-    payload = {"username": "Driftstatus", "embeds": embeds}
-    r = None
-    if ov.get("msg"):
-        r = requests.patch(f"{webhook}/messages/{ov['msg']}", json=payload, timeout=HTTP_TIMEOUT)
-        if r.status_code == 404:
-            ov.pop("msg"); r = None   # någon tog bort meddelandet: skapa nytt
-    if r is None:
-        r = requests.post(f"{webhook}?wait=true", json=payload, timeout=HTTP_TIMEOUT)
-        if r.ok:
-            ov["msg"] = r.json()["id"]
-            log.info("Översikt skapad (id %s) – fäst den i kanalen", ov["msg"])
-    r.raise_for_status()
-    ov.update(sig=sig, ts=time.time())
+    allov = state.setdefault("_overviews", {})
+    if "_overview" in state and "g0" not in allov:   # migrera tidigare enda översikt till grupp 0
+        allov["g0"] = state.pop("_overview")
+    for key, title, cats in _overview_groups(conf, snap):
+        embeds = overview_embeds(snap, title, cats)
+        sig = hashlib.sha1(json.dumps(embeds[0]["fields"][:-1] + embeds[1:], ensure_ascii=False).encode()).hexdigest()
+        ov = allov.setdefault(key, {})
+        if ov.get("sig") == sig and time.time() - ov.get("ts", 0) < 1800 and ov.get("msg"):
+            continue
+        payload = {"username": "Driftstatus", "embeds": embeds}
+        r = None
+        if ov.get("msg"):
+            r = requests.patch(f"{webhook}/messages/{ov['msg']}", json=payload, timeout=HTTP_TIMEOUT)
+            if r.status_code == 404:
+                ov.pop("msg"); r = None
+        if r is None:
+            r = requests.post(f"{webhook}?wait=true", json=payload, timeout=HTTP_TIMEOUT)
+            if r.ok:
+                ov["msg"] = r.json()["id"]
+                log.info("Översikt '%s' skapad (id %s) – fäst den i kanalen", title, ov["msg"])
+        r.raise_for_status()
+        ov.update(sig=sig, ts=time.time())
 
 
 def main() -> None:

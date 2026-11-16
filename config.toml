@@ -12,6 +12,11 @@ announce_open_on_start = true  # posta pågående incidenter vid första start
 translate = "auto"
 
 [discord]
+# Översikten delas i flera meddelanden (Discord har en gräns per meddelande).
+overview_groups = [
+  { title = "📱 Driftstatus – appar & vardag", categories = ["Vardagsappar", "Vård & apotek", "Myndigheter", "Strömning & sociala medier", "Nyheter, radio & ljudböcker", "Handla & spel", "Spel"] },
+  { title = "🖥️ Driftstatus – teknik, banker & bredband", categories = ["Microsoft", "Google", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Internetbanker", "Bredband (Sverige)"] },
+]
 webhook_url = ""
 mention = ""                   # t.ex. "<@&ROLL_ID>" för att pinga en roll
 
@@ -409,6 +414,263 @@ name = "PostNord"
 type = "http"
 urls = ["https://www.postnord.se/"]
 page = "https://www.postnord.se/"
+interval = 300
+
+# ---------------- Fler vardagstjänster (nåbarhetskontroll) ----------------
+[source.http_kry]
+category = "Vård & apotek"
+name = "Kry"
+type = "http"
+urls = ["https://www.kry.se/"]
+page = "https://www.kry.se/"
+interval = 300
+
+[source.http_mindoktor]
+category = "Vård & apotek"
+name = "Min Doktor"
+type = "http"
+urls = ["https://www.mindoktor.se/"]
+page = "https://www.mindoktor.se/"
+interval = 300
+
+[source.http_doktorse]
+category = "Vård & apotek"
+name = "Doktor.se"
+type = "http"
+urls = ["https://www.doktor.se/"]
+page = "https://www.doktor.se/"
+interval = 300
+
+[source.http_apoteket]
+category = "Vård & apotek"
+name = "Apoteket"
+type = "http"
+urls = ["https://www.apoteket.se/"]
+page = "https://www.apoteket.se/"
+interval = 300
+
+[source.http_hjartat]
+category = "Vård & apotek"
+name = "Apotek Hjärtat"
+type = "http"
+urls = ["https://www.apotekhjartat.se/"]
+page = "https://www.apotekhjartat.se/"
+interval = 300
+
+[source.http_kronans]
+category = "Vård & apotek"
+name = "Kronans Apotek"
+type = "http"
+urls = ["https://www.kronansapotek.se/"]
+page = "https://www.kronansapotek.se/"
+interval = 300
+
+[source.http_apotea]
+category = "Vård & apotek"
+name = "Apotea"
+type = "http"
+urls = ["https://www.apotea.se/"]
+page = "https://www.apotea.se/"
+interval = 300
+
+[source.http_skatteverket]
+category = "Myndigheter"
+name = "Skatteverket"
+type = "http"
+urls = ["https://www.skatteverket.se/"]
+page = "https://www.skatteverket.se/"
+interval = 300
+
+[source.http_fk]
+category = "Myndigheter"
+name = "Försäkringskassan"
+type = "http"
+urls = ["https://www.forsakringskassan.se/"]
+page = "https://www.forsakringskassan.se/"
+interval = 300
+
+[source.http_pension]
+category = "Myndigheter"
+name = "Pensionsmyndigheten"
+type = "http"
+urls = ["https://www.pensionsmyndigheten.se/"]
+page = "https://www.pensionsmyndigheten.se/"
+interval = 300
+
+[source.http_swedbank]
+category = "Internetbanker"
+name = "Swedbank"
+type = "http"
+urls = ["https://online.swedbank.se/"]
+page = "https://online.swedbank.se/"
+interval = 300
+
+[source.http_handelsbanken]
+category = "Internetbanker"
+name = "Handelsbanken"
+type = "http"
+urls = ["https://secure.handelsbanken.se/"]
+page = "https://secure.handelsbanken.se/"
+interval = 300
+
+[source.http_seb]
+category = "Internetbanker"
+name = "SEB"
+type = "http"
+urls = ["https://seb.se/"]
+page = "https://seb.se/"
+interval = 300
+
+[source.http_nordea]
+category = "Internetbanker"
+name = "Nordea"
+type = "http"
+urls = ["https://netbank.nordea.se/"]
+page = "https://netbank.nordea.se/"
+interval = 300
+
+[source.http_lf]
+category = "Internetbanker"
+name = "Länsförsäkringar"
+type = "http"
+urls = ["https://www.lansforsakringar.se/"]
+page = "https://www.lansforsakringar.se/"
+interval = 300
+
+[source.http_danske]
+category = "Internetbanker"
+name = "Danske Bank"
+type = "http"
+urls = ["https://danskebank.se/"]
+page = "https://danskebank.se/"
+interval = 300
+
+[source.http_icabanken]
+category = "Internetbanker"
+name = "ICA Banken"
+type = "http"
+urls = ["https://www.icabanken.se/"]
+page = "https://www.icabanken.se/"
+interval = 300
+
+[source.http_svt]
+category = "Nyheter, radio & ljudböcker"
+name = "SVT Nyheter"
+type = "http"
+urls = ["https://www.svt.se/"]
+page = "https://www.svt.se/"
+interval = 300
+
+[source.http_sr]
+category = "Nyheter, radio & ljudböcker"
+name = "Sveriges Radio"
+type = "http"
+urls = ["https://sverigesradio.se/"]
+page = "https://sverigesradio.se/"
+interval = 300
+
+[source.http_aftonbladet]
+category = "Nyheter, radio & ljudböcker"
+name = "Aftonbladet"
+type = "http"
+urls = ["https://www.aftonbladet.se/"]
+page = "https://www.aftonbladet.se/"
+interval = 300
+
+[source.http_expressen]
+category = "Nyheter, radio & ljudböcker"
+name = "Expressen"
+type = "http"
+urls = ["https://www.expressen.se/"]
+page = "https://www.expressen.se/"
+interval = 300
+
+[source.http_dn]
+category = "Nyheter, radio & ljudböcker"
+name = "DN"
+type = "http"
+urls = ["https://www.dn.se/"]
+page = "https://www.dn.se/"
+interval = 300
+
+[source.http_storytel]
+category = "Nyheter, radio & ljudböcker"
+name = "Storytel"
+type = "http"
+urls = ["https://www.storytel.com/"]
+page = "https://www.storytel.com/"
+interval = 300
+
+[source.http_bookbeat]
+category = "Nyheter, radio & ljudböcker"
+name = "BookBeat"
+type = "http"
+urls = ["https://www.bookbeat.com/"]
+page = "https://www.bookbeat.com/"
+interval = 300
+
+[source.http_ica]
+category = "Handla & spel"
+name = "ICA (handla online)"
+type = "http"
+urls = ["https://handlaprivatkund.ica.se/"]
+page = "https://handlaprivatkund.ica.se/"
+interval = 300
+
+[source.http_coop]
+category = "Handla & spel"
+name = "Coop"
+type = "http"
+urls = ["https://www.coop.se/"]
+page = "https://www.coop.se/"
+interval = 300
+
+[source.http_willys]
+category = "Handla & spel"
+name = "Willys"
+type = "http"
+urls = ["https://www.willys.se/"]
+page = "https://www.willys.se/"
+interval = 300
+
+[source.http_mathem]
+category = "Handla & spel"
+name = "Mathem"
+type = "http"
+urls = ["https://www.mathem.se/"]
+page = "https://www.mathem.se/"
+interval = 300
+
+[source.http_blocket]
+category = "Handla & spel"
+name = "Blocket"
+type = "http"
+urls = ["https://www.blocket.se/"]
+page = "https://www.blocket.se/"
+interval = 300
+
+[source.http_tradera]
+category = "Handla & spel"
+name = "Tradera"
+type = "http"
+urls = ["https://www.tradera.com/"]
+page = "https://www.tradera.com/"
+interval = 300
+
+[source.http_svenskaspel]
+category = "Handla & spel"
+name = "Svenska Spel"
+type = "http"
+urls = ["https://www.svenskaspel.se/"]
+page = "https://www.svenskaspel.se/"
+interval = 300
+
+[source.http_atg]
+category = "Handla & spel"
+name = "ATG"
+type = "http"
+urls = ["https://www.atg.se/"]
+page = "https://www.atg.se/"
 interval = 300
 
 # ---------------- Spel ----------------
