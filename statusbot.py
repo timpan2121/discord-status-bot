@@ -554,12 +554,109 @@ def open_incidents(conf: dict, state: dict) -> list[tuple[str, str]]:
     return res
 
 
+def snapshot(conf: dict, state: dict) -> dict:
+    """Kompakt status för slash-kommandona (Cloudflare Worker läser denna fil)."""
+    services = []
+    for key, sc in conf.get("source", {}).items():
+        if not sc.get("enabled", True):
+            continue
+        st = state.get(key, {})
+        opn = [v for v in st.get("open", {}).values() if isinstance(v, list)]
+        services.append({
+            "key": key, "name": sc.get("name", key), "category": sc.get("category", "Övrigt"),
+            "url": sc.get("page") or sc.get("url", ""), "type": sc["type"],
+            "failing": st.get("fails", 0) >= 3, "checked": int(st.get("checked", 0)),
+            "open": [{"title": t, "url": u, "severity": s, "status": stt} for t, u, s, stt in opn[:10]],
+        })
+    return {"generated": int(time.time()), "services": services}
+
+
+# ---------------------------------------------------------------- live-översikt (webhook)
+
+SEV_ICON = {"critical": "🔴", "major": "🟠", "minor": "🟡", "info": "🟡", "maintenance": "🔧"}
+SEV_RANK = {"critical": 4, "major": 3, "minor": 2, "info": 2, "maintenance": 1}
+CAT_ORDER = ["Microsoft", "Google", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
+
+
+def _svc_view(s: dict) -> tuple[str, str, int]:
+    opn = s["open"]
+    if s["failing"] and not opn:
+        return "⚪", "Kunde inte kontrolleras", 0
+    if opn:
+        w = max(opn, key=lambda o: SEV_RANK.get(o["severity"], 2))
+        lbl = "Underhåll" if w["severity"] == "maintenance" else f"{len(opn)} störning{'ar' if len(opn) > 1 else ''}"
+        return SEV_ICON.get(w["severity"], "🟡"), lbl, SEV_RANK.get(w["severity"], 2)
+    if s["type"] == "link":
+        return "🔗", "Kolla driftkartan för din adress", 0
+    if not s["checked"]:
+        return "⏳", "Väntar på första kontroll", 0
+    return "🟢", "Fungerar", 0
+
+
+def overview_embeds(snap: dict) -> list[dict]:
+    """Översikt + (om något krånglar) lista med länkar till varje pågående störning."""
+    rows = [(s, *_svc_view(s)) for s in snap["services"]]
+    worst = max((r[3] for r in rows), default=0)
+    bad = [r for r in rows if r[0]["open"]]
+    colors = [0x2ECC71, 0x3498DB, 0xF1C40F, 0xE67E22, 0xE74C3C]
+    lnk = lambda n, u: f"[{n}]({u})" if u.startswith("http") else n
+    e = {"title": "📡 Driftstatus – översikt", "color": colors[worst], "fields": [],
+         "description": f"**{'⚠️ Störningar hos %d av %d tjänster' % (len(bad), len(rows)) if bad else '✅ Alla tjänster fungerar'}**",
+         "footer": {"text": "🟢 OK  🟡 mindre  🟠 större  🔴 kritisk  🔧 underhåll  🔗 driftkarta  ⚪ okänt"}}
+    cats = sorted({r[0]["category"] for r in rows}, key=lambda c: CAT_ORDER.index(c) if c in CAT_ORDER else 99)
+    for c in cats:
+        lines = [f"{ic} {lnk(s['name'], s['url'])}" + ("" if ic == "🟢" else f" – *{lb}*")
+                 for s, ic, lb, rk in sorted((r for r in rows if r[0]["category"] == c), key=lambda r: (-r[3], r[0]["name"]))]
+        chunk, first = "", True
+        for ln in lines:
+            if len(chunk) + len(ln) + 1 > 1024:
+                e["fields"].append({"name": c if first else "\u200b", "value": chunk, "inline": False})
+                chunk, first = "", False
+            chunk = f"{chunk}\n{ln}" if chunk else ln
+        if chunk:
+            e["fields"].append({"name": c if first else "\u200b", "value": chunk, "inline": False})
+    e["fields"].append({"name": "\u200b", "value": f"Uppdateras automatiskt • senast <t:{snap['generated']}:R>", "inline": False})
+    out = [e]
+    if bad:
+        inc = {"title": f"⚠️ Pågående störningar ({sum(len(r[0]['open']) for r in bad)})", "color": 0xE67E22, "fields": []}
+        for s, ic, lb, rk in sorted(bad, key=lambda r: -r[3])[:20]:
+            val = "\n".join(f"{SEV_ICON.get(o['severity'], '🟡')} {lnk(o['title'][:150], o['url'])}" for o in s["open"][:5])
+            inc["fields"].append({"name": s["name"], "value": val[:1024], "inline": False})
+        out.append(inc)
+    return out
+
+
+def update_overview(webhook: str, conf: dict, state: dict) -> None:
+    """Redigera översiktsmeddelandet (skapa det om det saknas). Bara när något ändrats eller var 30:e min."""
+    snap = snapshot(conf, state)
+    embeds = overview_embeds(snap)
+    sig = hashlib.sha1(json.dumps([[ (s["name"], _svc_view(s)[0], [o["title"] for o in s["open"]]) for s in snap["services"]]],
+                                  ensure_ascii=False).encode()).hexdigest()
+    ov = state.setdefault("_overview", {})
+    if ov.get("sig") == sig and time.time() - ov.get("ts", 0) < 1800 and ov.get("msg"):
+        return
+    payload = {"username": "Driftstatus", "embeds": embeds}
+    r = None
+    if ov.get("msg"):
+        r = requests.patch(f"{webhook}/messages/{ov['msg']}", json=payload, timeout=HTTP_TIMEOUT)
+        if r.status_code == 404:
+            ov.pop("msg"); r = None   # någon tog bort meddelandet: skapa nytt
+    if r is None:
+        r = requests.post(f"{webhook}?wait=true", json=payload, timeout=HTTP_TIMEOUT)
+        if r.ok:
+            ov["msg"] = r.json()["id"]
+            log.info("Översikt skapad (id %s) – fäst den i kanalen", ov["msg"])
+    r.raise_for_status()
+    ov.update(sig=sig, ts=time.time())
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("-c", "--config", default="config.toml")
     ap.add_argument("--state", default="state.json")
     ap.add_argument("--once", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--snapshot", help="skriv sammanfattning (JSON) till denna fil efter varje runda")
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     conf = tomllib.loads(Path(a.config).read_text())
@@ -572,6 +669,15 @@ def main() -> None:
         tmp = sp.with_suffix(".tmp")
         tmp.write_text(json.dumps(state))
         tmp.replace(sp)
+        hook = os.environ.get("DISCORD_WEBHOOK_URL") or conf.get("discord", {}).get("webhook_url")
+        if hook and not a.dry_run and conf.get("discord", {}).get("overview", True):
+            try:
+                update_overview(hook, conf, state)
+            except Exception as ex:  # noqa: BLE001
+                log.warning("Kunde inte uppdatera översikten: %s", ex)
+            tmp.write_text(json.dumps(state)); tmp.replace(sp)
+        if a.snapshot:
+            Path(a.snapshot).write_text(json.dumps(snapshot(conf, state), ensure_ascii=False))
         if a.once:
             break
         time.sleep(30)
