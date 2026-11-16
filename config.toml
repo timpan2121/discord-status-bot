@@ -1237,7 +1237,7 @@ via = " (Swish)"
 
 [source.bank_lunar]
 category = "Banker & betalningar"
-name = "Lunar"
+name = "Lunar (Swish)"
 type = "statuspage_component"
 url = "https://status.swish.nu"
 component = "Lunar"
