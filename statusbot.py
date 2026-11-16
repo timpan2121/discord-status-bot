@@ -862,6 +862,8 @@ def update_overview(webhook: str, conf: dict, state: dict) -> None:
     for key, title, cats, reach in _overview_groups(conf, snap):
         embeds = overview_embeds(snap, title, cats, reach)
         if reach:
+            bad = sum(1 for x in snap["services"] if x["type"] == "http" and x["open"])
+            embeds[0]["description"] = (f"**📵 {bad} tjänster svarar inte**" if bad else "**✅ Alla tjänster svarar**")
             embeds[0]["footer"] = {"text": "🟢 svarar  📵 svarar inte  •  Egen kontroll var 15:e min (3 försök) – "
                                            "inte officiella störningsrapporter"}
         sig = hashlib.sha1(json.dumps(embeds[0]["fields"][:-1] + embeds[1:], ensure_ascii=False).encode()).hexdigest()
