@@ -562,6 +562,35 @@ def src_inera(cfg: dict) -> list[Incident]:
     return out
 
 
+def src_aws(cfg: dict) -> list[Incident]:
+    """AWS Health (aktuella händelser). `regions` = prefix att bevaka, t.ex. ["eu-", "us-east-1"]."""
+    raw = get("https://health.aws.amazon.com/public/currentevents").content
+    for enc in ("utf-8-sig", "utf-16"):
+        try:
+            data = json.loads(raw.decode(enc))
+            break
+        except (UnicodeDecodeError, ValueError):
+            data = []
+    regs = cfg.get("regions", [])
+    out = []
+    for ev in data:
+        arn = ev.get("arn", "")
+        region = arn.split(":")[3] if arn.count(":") >= 4 else ""
+        if regs and not any(region.startswith(r) or ev.get("service", "").endswith(r) for r in regs):
+            continue
+        log_ = ev.get("event_log") or [{}]
+        last = max(log_, key=lambda x: x.get("timestamp", 0))
+        resolved = str(ev.get("status")) == "0" or "[RESOLVED]" in ev.get("summary", "")
+        out.append(Incident(
+            uid=arn or ev.get("summary", ""), title=f"{ev.get('service_name', '')} ({ev.get('region_name', '')}): "
+            + ev.get("summary", "").replace("[RESOLVED] ", ""),
+            status="resolved" if resolved else "investigating", severity="resolved" if resolved else "major",
+            url="https://health.aws.amazon.com/health/status", body=clean(last.get("message", "")),
+            components=[ev.get("service_name", "")], updated=f"{ev.get('status')}|{last.get('timestamp')}",
+            resolved=resolved))
+    return out
+
+
 def src_link(cfg: dict) -> list[Incident]:
     """Bara en länk i översikten (sidor som kräver adress/JS). Pollas inte, postar aldrig."""
     return []
@@ -588,7 +617,7 @@ def src_m365public(cfg: dict) -> list[Incident]:
     return out
 
 
-SOURCES = {"link": src_link, "inera": src_inera, "meta": src_meta, "playstation": src_playstation, "xbox": src_xbox, "http": src_http, "apple": src_apple, "statuspage_component": src_statuspage_component, "freshstatus": src_freshstatus, "statusiq": src_statusiq, "m365public": src_m365public, "statuspage": src_statuspage, "rss": src_rss, "google": src_google,
+SOURCES = {"link": src_link, "aws": src_aws, "inera": src_inera, "meta": src_meta, "playstation": src_playstation, "xbox": src_xbox, "http": src_http, "apple": src_apple, "statuspage_component": src_statuspage_component, "freshstatus": src_freshstatus, "statusiq": src_statusiq, "m365public": src_m365public, "statuspage": src_statuspage, "rss": src_rss, "google": src_google,
            "slack": src_slack, "msgraph": src_msgraph, "webpage": src_webpage}
 
 

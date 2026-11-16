@@ -30,7 +30,7 @@ service = "m365Consumer"
 interval = 60
 
 [source.azure]
-category = "Microsoft"
+category = "Moln & infrastruktur"
 page = "https://azure.status.microsoft/en-us/status/"
 name = "Azure"
 type = "rss"
@@ -57,10 +57,9 @@ url = "https://www.cloudflarestatus.com"
 [source.aws]
 category = "Moln & infrastruktur"
 page = "https://health.aws.amazon.com/health/status"
-name = "AWS"
-type = "rss"
-url = "https://status.aws.amazon.com/rss/all.rss"
-enabled = false   # mycket brusigt, slå på vid behov
+name = "Amazon AWS"
+type = "aws"
+regions = ["eu-", "us-east-1"]   # Europa (inkl. Stockholm) + us-east-1 (AWS globala tjänster)
 
 
 # ---------------- Google ----------------
@@ -145,7 +144,7 @@ page = "https://www.google.com/appsstatus/dashboard/"
 exclude_products = ["Admin Console", "Gemini", "Gemini Notebook", "Gmail", "Google Calendar", "Google Chat", "Google Docs", "Google Drive", "Google Forms", "Google Meet", "Google Sheets", "Google Sign In", "Google Slides"]
 
 [source.google_cloud]
-category = "Google"
+category = "Moln & infrastruktur"
 name = "Google Cloud"
 type = "google"
 url = "https://status.cloud.google.com/incidents.json"
