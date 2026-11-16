@@ -754,13 +754,11 @@ urls = ["https://www.collector.se/"]
 page = "https://www.collector.se/"
 interval = 600
 
-[source.http_lunar]
-category = "Internetbanker"
+[source.lunar]
+category = "Banker & betalningar"
 name = "Lunar"
-type = "http"
-urls = ["https://www.lunar.app/"]
-page = "https://www.lunar.app/"
-interval = 600
+type = "statuspage"
+url = "https://status.lunar.app"
 
 [source.http_northmill]
 category = "Internetbanker"
@@ -915,13 +913,12 @@ urls = ["https://www.transportstyrelsen.se/"]
 page = "https://www.transportstyrelsen.se/"
 interval = 600
 
-[source.http_ehalso]
+[source.ehalso]
 category = "Myndigheter"
-name = "E-hälsomyndigheten (recept)"
-type = "http"
-urls = ["https://www.ehalsomyndigheten.se/"]
-page = "https://www.ehalsomyndigheten.se/"
-interval = 600
+name = "E-hälsomyndigheten (e-recept)"
+type = "webpage"
+url = "https://www.ehalsomyndigheten.se/verksamhet/driftinformation/"
+ok_text = "Alla tjänster är i full drift"
 
 [source.http_capio]
 category = "Vård & apotek"
@@ -971,13 +968,11 @@ urls = ["https://www.ellevio.se/"]
 page = "https://www.ellevio.se/"
 interval = 600
 
-[source.http_tibber]
+[source.tibber]
 category = "El & energi"
 name = "Tibber"
-type = "http"
-urls = ["https://tibber.com/se"]
-page = "https://tibber.com/se"
-interval = 600
+type = "statuspage"
+url = "https://status.tibber.com"
 
 [source.http_tre]
 category = "Mobiloperatörer"
