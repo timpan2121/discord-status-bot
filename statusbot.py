@@ -305,6 +305,11 @@ def src_webpage(cfg: dict) -> list[Incident]:
     if cfg.get("extract"):
         m = re.search(cfg["extract"], text, re.S | re.I)
         text = m.group(1 if m.groups() else 0) if m else ""
+    if cfg.get("ok_text"):
+        ok = cfg["ok_text"].lower() in text.lower()
+        return [Incident(uid="page", title=f"{cfg.get('name', '')} " + ("fungerar igen" if ok else "rapporterar problem"),
+                         status="ok" if ok else "problem", severity="resolved" if ok else "major", resolved=ok,
+                         url=cfg["url"], body="" if ok else clean(text[:500]), updated="ok" if ok else "problem")]
     kws = [k.lower() for k in cfg.get("keywords", [])]
     if kws:
         hits = [k for k in kws if k in text.lower()]
@@ -437,6 +442,126 @@ def src_apple(cfg: dict) -> list[Incident]:
     return out
 
 
+def _psn_msg(st: dict) -> str:
+    ms = (st.get("message") or {}).get("messages") or {}
+    if isinstance(ms, dict):
+        for loc in ("sv-SE", "en-GB", "en-US"):
+            if ms.get(loc):
+                return str(ms[loc])
+    return ""
+
+
+def src_playstation(cfg: dict) -> list[Incident]:
+    """PlayStation Network: status för ett land (default SE) + regionstörningar med sv/en-text."""
+    d = get(f"https://status.playstation.com/data/statuses/region/{cfg.get('region', 'SCEE')}.json").json()
+    found: list[tuple[str, dict]] = []
+    for st in d.get("status", []):
+        if _psn_msg(st):              # regionstörningar utan sv/en-text gäller andra länder
+            found.append(("PlayStation Network", st))
+    country = next((c for c in d.get("countries", []) if c.get("countryCode") == cfg.get("country", "SE")), {})
+    for st in country.get("status", []):
+        found.append(("PlayStation Network", st))
+    for svc in country.get("services", []):
+        sname = (svc.get("i18n") or {}).get("en-GB") or svc.get("serviceName", "")
+        for st in svc.get("status", []):
+            found.append((sname, st))
+        for res in svc.get("resources", []):
+            for st in res.get("status", []):
+                found.append((f"{sname} – {(res.get('i18n') or {}).get('en-GB') or res.get('resourceName', '')}", st))
+    out = []
+    for where, st in found:
+        typ = st.get("statusType", "Outage")
+        resolved = bool(st.get("endDate"))
+        out.append(Incident(
+            uid=st.get("statusId", where), title=f"{where}: {'underhåll' if 'maint' in typ.lower() else 'störning'}",
+            status=typ, severity="resolved" if resolved else ("maintenance" if "maint" in typ.lower() else "major"),
+            url="https://status.playstation.com/sv-se/", body=clean(_psn_msg(st)), components=[where],
+            updated=st.get("modifiedDate", ""), resolved=resolved))
+    return out
+
+
+def src_xbox(cfg: dict) -> list[Incident]:
+    """Xbox Live (officiellt XML-flöde). En incident per funktion som inte är 'None'."""
+    root = ET.fromstring(get(f"https://xnotify.xboxlive.com/servicestatusv6/{cfg.get('country', 'SE')}/sv-SE").content)
+    out = []
+    for cat in root.iter("Category"):
+        cname = cat.findtext("Name", "")
+        for sc in cat.iter("Scenario"):
+            state = sc.findtext("Status/Name", "None")
+            if state in ("None", "Normal", ""):
+                continue
+            name = sc.findtext("Name", "")
+            out.append(Incident(
+                uid=sc.findtext("Id", name), title=f"{cname} – {name}: {state}", status=state,
+                severity="critical" if state.lower() in ("major", "critical") else "major",
+                url="https://support.xbox.com/sv-SE/xbox-live-status", components=[cname],
+                body=clean(" ".join(t.text or "" for t in sc.iter("Message"))), updated=state))
+    return out
+
+
+def src_http(cfg: dict) -> list[Incident]:
+    """Egen nåbarhetskontroll när tjänsten saknar statussida. 3 försök innan larm."""
+    bad = []
+    for url in cfg["urls"]:
+        err = ""
+        for attempt in range(3):
+            try:
+                r = requests.get(url, headers=UA, timeout=15)
+                if r.status_code < 500:
+                    err = ""
+                    break
+                err = f"HTTP {r.status_code}"
+            except requests.RequestException as ex:
+                err = type(ex).__name__
+            time.sleep(5)
+        if err:
+            bad.append(f"{url} ({err})")
+    if not bad:
+        return [Incident(uid="reach", title=f"{cfg.get('name', '')} svarar igen", status="ok", resolved=True,
+                         severity="resolved", url=cfg.get("page", ""), updated="ok")]
+    return [Incident(uid="reach", title=f"{cfg.get('name', '')} svarar inte", status="nere", severity="major",
+                     url=cfg.get("page", ""), body="Kunde inte nå: " + ", ".join(bad), updated="down")]
+
+
+def src_meta(cfg: dict) -> list[Incident]:
+    """Meta (metastatus.com). `orgs` = lista med org-id, t.ex. ["messenger", "whatsapp-business-api"]."""
+    orgs = get("https://metastatus.com/data/orgs.json").json()
+    want = set(cfg.get("orgs", []))
+    out = []
+    for org in orgs:
+        if want and org.get("id") not in want:
+            continue
+        for svc in org.get("services", []):
+            st = svc.get("status") or ""
+            ok = st.lower().startswith("no known issues") or st == ""
+            out.append(Incident(
+                uid=f"{org['id']}/{svc.get('id', svc.get('name'))}",
+                title=f"{org.get('name', org['id'])}: {svc.get('name', '')}" + ("" if ok else f" – {st}"),
+                status=st or "OK", severity="resolved" if ok else ("critical" if "outage" in st.lower() else "major"),
+                url="https://metastatus.com/", components=[org.get("name", "")],
+                updated=f"{st}|{svc.get('time')}", resolved=ok))
+    return out
+
+
+def src_inera(cfg: dict) -> list[Incident]:
+    """Inera driftstatus (1177 m.fl.). `match` = lista med namn-början, t.ex. ["1177 app", "1177 inkorg"]."""
+    d = get("https://www.inera.se/api/v2/service/all").json()
+    want = [m.lower() for m in cfg.get("match", [])]
+    out = []
+    for x in d.get("allStatuses", []):
+        name = x.get("name", "")
+        if want and not any(name.lower().startswith(w) for w in want):
+            continue
+        lvl = int(x.get("statusLevel") or 0)
+        ok = lvl == 0
+        out.append(Incident(
+            uid=name, title=f"{name}: {x.get('statusName', '')}" if not ok else f"{name} fungerar igen",
+            status=x.get("statusName", ""), severity="resolved" if ok else ("major" if lvl >= 2 else "minor"),
+            url="https://www.inera.se/driftstatus/", body=clean(x.get("details") or ""), components=[name],
+            updated=f"{lvl}|{x.get('date')}|{x.get('details')}", resolved=ok))
+    return out
+
+
 def src_link(cfg: dict) -> list[Incident]:
     """Bara en länk i översikten (sidor som kräver adress/JS). Pollas inte, postar aldrig."""
     return []
@@ -463,7 +588,7 @@ def src_m365public(cfg: dict) -> list[Incident]:
     return out
 
 
-SOURCES = {"link": src_link, "apple": src_apple, "statuspage_component": src_statuspage_component, "freshstatus": src_freshstatus, "statusiq": src_statusiq, "m365public": src_m365public, "statuspage": src_statuspage, "rss": src_rss, "google": src_google,
+SOURCES = {"link": src_link, "inera": src_inera, "meta": src_meta, "playstation": src_playstation, "xbox": src_xbox, "http": src_http, "apple": src_apple, "statuspage_component": src_statuspage_component, "freshstatus": src_freshstatus, "statusiq": src_statusiq, "m365public": src_m365public, "statuspage": src_statuspage, "rss": src_rss, "google": src_google,
            "slack": src_slack, "msgraph": src_msgraph, "webpage": src_webpage}
 
 
@@ -599,7 +724,7 @@ def snapshot(conf: dict, state: dict) -> dict:
 
 SEV_ICON = {"critical": "🔴", "major": "🟠", "minor": "🟡", "info": "🟡", "maintenance": "🔧"}
 SEV_RANK = {"critical": 4, "major": 3, "minor": 2, "info": 2, "maintenance": 1}
-CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
+CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Spel", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
 
 
 def _svc_view(s: dict) -> tuple[str, str, int]:

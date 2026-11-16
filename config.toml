@@ -259,7 +259,73 @@ type = "apple"
 page = "https://www.apple.com/se/support/systemstatus/"
 services = ["Apple Account"]
 
+[source.meta]
+category = "Vardagsappar"
+name = "Facebook / Messenger / WhatsApp (Meta)"
+type = "meta"
+orgs = ["messenger", "ig-messenger", "whatsapp-business-api", "facebook-login"]
+page = "https://metastatus.com/"
+
+[source.signal]
+category = "Vardagsappar"
+name = "Signal"
+type = "webpage"
+url = "https://status.signal.org/"
+ok_text = "Signal is up and running"
+
+# 1177 (via Inera driftstatus)
+[source.vard_1177]
+category = "Vardagsappar"
+name = "1177 (app, inkorg, journal, tidbokning)"
+type = "inera"
+match = ["1177 app", "1177 inkorg", "1177 inloggningsportal", "1177 journal", "1177 tidbokning", "1177 informationsportal", "1177 intyg", "1177 på telefon", "1177 symtombedömning"]
+page = "https://www.inera.se/driftstatus/"
+
+# ---------------- Spel ----------------
+[source.twitch]
+category = "Spel"
+name = "Twitch"
+type = "statuspage"
+url = "https://status.twitch.com"
+
+[source.playstation]
+category = "Spel"
+name = "PlayStation Network"
+type = "playstation"
+region = "SCEE"
+country = "SE"
+page = "https://status.playstation.com/sv-se/"
+
+[source.xbox]
+category = "Spel"
+name = "Xbox"
+type = "xbox"
+country = "SE"
+page = "https://support.xbox.com/sv-SE/xbox-live-status"
+
+# Steam har ingen officiell statussida: vi kontrollerar själva att butiken och API:t svarar.
+[source.steam]
+category = "Spel"
+name = "Steam"
+type = "http"
+urls = ["https://store.steampowered.com/", "https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/"]
+page = "https://steamstat.us/"
+
 # ---------------- Banker & betalningar ----------------
+[source.freja]
+category = "Banker & betalningar"
+name = "Freja eID"
+type = "statuspage_component"
+url = "https://status.signicat.com"
+component = "Freja eID"
+
+# Revolut: statussidan är skyddad/privat – visas som länk
+[source.revolut]
+category = "Banker & betalningar"
+name = "Revolut"
+type = "link"
+url = "https://www.revolut.com/system-status/"
+
 [source.vipps_mobilepay]
 category = "Banker & betalningar"
 name = "Vipps MobilePay"
