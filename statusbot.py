@@ -507,7 +507,9 @@ def src_http(cfg: dict) -> list[Incident]:
         for attempt in range(3):
             t0 = time.time()
             try:
-                r = requests.get(url, headers=UA, timeout=15)
+                # följ inte omdirigeringar: ett 3xx-svar bevisar redan att servern lever
+                # (målsidan kan t.ex. geoblockera GitHubs servrar i USA)
+                r = requests.get(url, headers=UA, timeout=15, allow_redirects=False)
                 if r.status_code < 500:
                     err = ""
                     times.append(time.time() - t0)
@@ -693,6 +695,13 @@ def run_once(conf: dict, state: dict, dry: bool, sender=None) -> dict:
         st["last"] = now
         try:
             incidents = SOURCES[sc["type"]](sc)
+            if sc["type"] == "http":
+                # kräv två körningar i rad utan svar innan "svarar inte" postas (mot falsklarm)
+                down = any(not i.resolved for i in incidents)
+                st["reach_fail"] = st.get("reach_fail", 0) + 1 if down else 0
+                if down and st["reach_fail"] < 2:
+                    log.info("%s svarar inte (1:a gången) – väntar en körning till innan larm", name)
+                    incidents = []
             st["fails"] = 0
             stats["ok"] += 1
         except Exception as ex:  # noqa: BLE001
