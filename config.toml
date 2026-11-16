@@ -890,13 +890,6 @@ type = "statuspage_component"
 url = "https://status.signicat.com"
 component = "Freja eID"
 
-# Revolut: statussidan är skyddad/privat – visas som länk
-[source.revolut]
-category = "Banker & betalningar"
-name = "Revolut"
-type = "link"
-url = "https://www.revolut.com/system-status/"
-
 [source.vipps_mobilepay]
 category = "Banker & betalningar"
 name = "Vipps MobilePay"
