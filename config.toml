@@ -13,9 +13,10 @@ translate = "auto"
 
 [discord]
 # Översikten delas i flera meddelanden (Discord har en gräns per meddelande).
+# Tjänster utan officiell status (type = "http") visas i en egen översikt:
+reach_title = "📶 Nåbarhet – egen kontroll"
 overview_groups = [
-  { title = "📱 Driftstatus – appar & vardag", categories = ["Vardagsappar", "Vård & apotek", "Myndigheter", "Strömning & sociala medier", "Nyheter, radio & ljudböcker", "Handla & spel", "Spel"] },
-  { title = "🖥️ Driftstatus – teknik, banker & bredband", categories = ["Microsoft", "Google", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Internetbanker", "Bredband (Sverige)"] },
+  { title = "📡 Driftstatus – officiella statussidor", categories = ["Microsoft", "Google", "Moln & infrastruktur", "Vardagsappar", "Spel", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"] },
 ]
 webhook_url = ""
 mention = ""                   # t.ex. "<@&ROLL_ID>" för att pinga en roll
@@ -293,7 +294,7 @@ name = "Netflix"
 type = "http"
 urls = ["https://www.netflix.com/"]
 page = "https://www.netflix.com/"
-interval = 300
+interval = 900
 
 [source.http_youtube]
 category = "Strömning & sociala medier"
@@ -301,7 +302,7 @@ name = "YouTube"
 type = "http"
 urls = ["https://www.youtube.com/"]
 page = "https://www.youtube.com/"
-interval = 300
+interval = 900
 
 [source.http_disneyplus]
 category = "Strömning & sociala medier"
@@ -309,7 +310,7 @@ name = "Disney+"
 type = "http"
 urls = ["https://www.disneyplus.com/"]
 page = "https://www.disneyplus.com/"
-interval = 300
+interval = 900
 
 [source.http_viaplay]
 category = "Strömning & sociala medier"
@@ -317,7 +318,7 @@ name = "Viaplay"
 type = "http"
 urls = ["https://www.viaplay.se/"]
 page = "https://www.viaplay.se/"
-interval = 300
+interval = 900
 
 [source.http_max]
 category = "Strömning & sociala medier"
@@ -325,7 +326,7 @@ name = "Max (HBO)"
 type = "http"
 urls = ["https://www.max.com/", "https://play.max.com/"]
 page = "https://www.max.com/"
-interval = 300
+interval = 900
 
 [source.http_svtplay]
 category = "Strömning & sociala medier"
@@ -333,7 +334,7 @@ name = "SVT Play"
 type = "http"
 urls = ["https://www.svtplay.se/"]
 page = "https://www.svtplay.se/"
-interval = 300
+interval = 900
 
 [source.http_tv4play]
 category = "Strömning & sociala medier"
@@ -341,7 +342,7 @@ name = "TV4 Play"
 type = "http"
 urls = ["https://www.tv4play.se/"]
 page = "https://www.tv4play.se/"
-interval = 300
+interval = 900
 
 [source.http_spotify]
 category = "Strömning & sociala medier"
@@ -349,7 +350,7 @@ name = "Spotify"
 type = "http"
 urls = ["https://open.spotify.com/", "https://api.spotify.com/v1/"]
 page = "https://open.spotify.com/"
-interval = 300
+interval = 900
 
 [source.http_facebook]
 category = "Strömning & sociala medier"
@@ -357,7 +358,7 @@ name = "Facebook"
 type = "http"
 urls = ["https://www.facebook.com/"]
 page = "https://www.facebook.com/"
-interval = 300
+interval = 900
 
 [source.http_instagram]
 category = "Strömning & sociala medier"
@@ -365,7 +366,7 @@ name = "Instagram"
 type = "http"
 urls = ["https://www.instagram.com/"]
 page = "https://www.instagram.com/"
-interval = 300
+interval = 900
 
 [source.http_whatsapp]
 category = "Strömning & sociala medier"
@@ -373,7 +374,7 @@ name = "WhatsApp"
 type = "http"
 urls = ["https://web.whatsapp.com/"]
 page = "https://web.whatsapp.com/"
-interval = 300
+interval = 900
 
 [source.http_telegram]
 category = "Strömning & sociala medier"
@@ -381,7 +382,7 @@ name = "Telegram"
 type = "http"
 urls = ["https://telegram.org/", "https://web.telegram.org/"]
 page = "https://telegram.org/"
-interval = 300
+interval = 900
 
 [source.http_tiktok]
 category = "Strömning & sociala medier"
@@ -389,7 +390,7 @@ name = "TikTok"
 type = "http"
 urls = ["https://www.tiktok.com/"]
 page = "https://www.tiktok.com/"
-interval = 300
+interval = 900
 
 [source.http_snapchat]
 category = "Strömning & sociala medier"
@@ -397,7 +398,7 @@ name = "Snapchat"
 type = "http"
 urls = ["https://www.snapchat.com/"]
 page = "https://www.snapchat.com/"
-interval = 300
+interval = 900
 
 [source.http_kivra]
 category = "Vardagsappar"
@@ -405,7 +406,7 @@ name = "Kivra"
 type = "http"
 urls = ["https://www.kivra.com/", "https://app.kivra.com/"]
 page = "https://www.kivra.com/"
-interval = 300
+interval = 900
 
 [source.http_postnord]
 category = "Vardagsappar"
@@ -413,7 +414,7 @@ name = "PostNord"
 type = "http"
 urls = ["https://www.postnord.se/"]
 page = "https://www.postnord.se/"
-interval = 300
+interval = 900
 
 # ---------------- Fler vardagstjänster (nåbarhetskontroll) ----------------
 [source.http_kry]
@@ -422,7 +423,7 @@ name = "Kry"
 type = "http"
 urls = ["https://www.kry.se/"]
 page = "https://www.kry.se/"
-interval = 300
+interval = 900
 
 [source.http_mindoktor]
 category = "Vård & apotek"
@@ -430,7 +431,7 @@ name = "Min Doktor"
 type = "http"
 urls = ["https://www.mindoktor.se/"]
 page = "https://www.mindoktor.se/"
-interval = 300
+interval = 900
 
 [source.http_doktorse]
 category = "Vård & apotek"
@@ -438,7 +439,7 @@ name = "Doktor.se"
 type = "http"
 urls = ["https://www.doktor.se/"]
 page = "https://www.doktor.se/"
-interval = 300
+interval = 900
 
 [source.http_apoteket]
 category = "Vård & apotek"
@@ -446,7 +447,7 @@ name = "Apoteket"
 type = "http"
 urls = ["https://www.apoteket.se/"]
 page = "https://www.apoteket.se/"
-interval = 300
+interval = 900
 
 [source.http_hjartat]
 category = "Vård & apotek"
@@ -454,7 +455,7 @@ name = "Apotek Hjärtat"
 type = "http"
 urls = ["https://www.apotekhjartat.se/"]
 page = "https://www.apotekhjartat.se/"
-interval = 300
+interval = 900
 
 [source.http_kronans]
 category = "Vård & apotek"
@@ -462,7 +463,7 @@ name = "Kronans Apotek"
 type = "http"
 urls = ["https://www.kronansapotek.se/"]
 page = "https://www.kronansapotek.se/"
-interval = 300
+interval = 900
 
 [source.http_apotea]
 category = "Vård & apotek"
@@ -470,7 +471,7 @@ name = "Apotea"
 type = "http"
 urls = ["https://www.apotea.se/"]
 page = "https://www.apotea.se/"
-interval = 300
+interval = 900
 
 [source.http_skatteverket]
 category = "Myndigheter"
@@ -478,7 +479,7 @@ name = "Skatteverket"
 type = "http"
 urls = ["https://www.skatteverket.se/"]
 page = "https://www.skatteverket.se/"
-interval = 300
+interval = 900
 
 [source.http_fk]
 category = "Myndigheter"
@@ -486,7 +487,7 @@ name = "Försäkringskassan"
 type = "http"
 urls = ["https://www.forsakringskassan.se/"]
 page = "https://www.forsakringskassan.se/"
-interval = 300
+interval = 900
 
 [source.http_pension]
 category = "Myndigheter"
@@ -494,7 +495,7 @@ name = "Pensionsmyndigheten"
 type = "http"
 urls = ["https://www.pensionsmyndigheten.se/"]
 page = "https://www.pensionsmyndigheten.se/"
-interval = 300
+interval = 900
 
 [source.http_swedbank]
 category = "Internetbanker"
@@ -502,7 +503,7 @@ name = "Swedbank"
 type = "http"
 urls = ["https://online.swedbank.se/"]
 page = "https://online.swedbank.se/"
-interval = 300
+interval = 900
 
 [source.http_handelsbanken]
 category = "Internetbanker"
@@ -510,7 +511,7 @@ name = "Handelsbanken"
 type = "http"
 urls = ["https://secure.handelsbanken.se/"]
 page = "https://secure.handelsbanken.se/"
-interval = 300
+interval = 900
 
 [source.http_seb]
 category = "Internetbanker"
@@ -518,7 +519,7 @@ name = "SEB"
 type = "http"
 urls = ["https://seb.se/"]
 page = "https://seb.se/"
-interval = 300
+interval = 900
 
 [source.http_nordea]
 category = "Internetbanker"
@@ -526,7 +527,7 @@ name = "Nordea"
 type = "http"
 urls = ["https://netbank.nordea.se/"]
 page = "https://netbank.nordea.se/"
-interval = 300
+interval = 900
 
 [source.http_lf]
 category = "Internetbanker"
@@ -534,7 +535,7 @@ name = "Länsförsäkringar"
 type = "http"
 urls = ["https://www.lansforsakringar.se/"]
 page = "https://www.lansforsakringar.se/"
-interval = 300
+interval = 900
 
 [source.http_danske]
 category = "Internetbanker"
@@ -542,7 +543,7 @@ name = "Danske Bank"
 type = "http"
 urls = ["https://danskebank.se/"]
 page = "https://danskebank.se/"
-interval = 300
+interval = 900
 
 [source.http_icabanken]
 category = "Internetbanker"
@@ -550,7 +551,7 @@ name = "ICA Banken"
 type = "http"
 urls = ["https://www.icabanken.se/"]
 page = "https://www.icabanken.se/"
-interval = 300
+interval = 900
 
 [source.http_svt]
 category = "Nyheter, radio & ljudböcker"
@@ -558,7 +559,7 @@ name = "SVT Nyheter"
 type = "http"
 urls = ["https://www.svt.se/"]
 page = "https://www.svt.se/"
-interval = 300
+interval = 900
 
 [source.http_sr]
 category = "Nyheter, radio & ljudböcker"
@@ -566,7 +567,7 @@ name = "Sveriges Radio"
 type = "http"
 urls = ["https://sverigesradio.se/"]
 page = "https://sverigesradio.se/"
-interval = 300
+interval = 900
 
 [source.http_aftonbladet]
 category = "Nyheter, radio & ljudböcker"
@@ -574,7 +575,7 @@ name = "Aftonbladet"
 type = "http"
 urls = ["https://www.aftonbladet.se/"]
 page = "https://www.aftonbladet.se/"
-interval = 300
+interval = 900
 
 [source.http_expressen]
 category = "Nyheter, radio & ljudböcker"
@@ -582,7 +583,7 @@ name = "Expressen"
 type = "http"
 urls = ["https://www.expressen.se/"]
 page = "https://www.expressen.se/"
-interval = 300
+interval = 900
 
 [source.http_dn]
 category = "Nyheter, radio & ljudböcker"
@@ -590,7 +591,7 @@ name = "DN"
 type = "http"
 urls = ["https://www.dn.se/"]
 page = "https://www.dn.se/"
-interval = 300
+interval = 900
 
 [source.http_storytel]
 category = "Nyheter, radio & ljudböcker"
@@ -598,7 +599,7 @@ name = "Storytel"
 type = "http"
 urls = ["https://www.storytel.com/"]
 page = "https://www.storytel.com/"
-interval = 300
+interval = 900
 
 [source.http_bookbeat]
 category = "Nyheter, radio & ljudböcker"
@@ -606,7 +607,7 @@ name = "BookBeat"
 type = "http"
 urls = ["https://www.bookbeat.com/"]
 page = "https://www.bookbeat.com/"
-interval = 300
+interval = 900
 
 [source.http_ica]
 category = "Handla & spel"
@@ -614,7 +615,7 @@ name = "ICA (handla online)"
 type = "http"
 urls = ["https://handlaprivatkund.ica.se/"]
 page = "https://handlaprivatkund.ica.se/"
-interval = 300
+interval = 900
 
 [source.http_coop]
 category = "Handla & spel"
@@ -622,7 +623,7 @@ name = "Coop"
 type = "http"
 urls = ["https://www.coop.se/"]
 page = "https://www.coop.se/"
-interval = 300
+interval = 900
 
 [source.http_willys]
 category = "Handla & spel"
@@ -630,7 +631,7 @@ name = "Willys"
 type = "http"
 urls = ["https://www.willys.se/"]
 page = "https://www.willys.se/"
-interval = 300
+interval = 900
 
 [source.http_mathem]
 category = "Handla & spel"
@@ -638,7 +639,7 @@ name = "Mathem"
 type = "http"
 urls = ["https://www.mathem.se/"]
 page = "https://www.mathem.se/"
-interval = 300
+interval = 900
 
 [source.http_blocket]
 category = "Handla & spel"
@@ -646,7 +647,7 @@ name = "Blocket"
 type = "http"
 urls = ["https://www.blocket.se/"]
 page = "https://www.blocket.se/"
-interval = 300
+interval = 900
 
 [source.http_tradera]
 category = "Handla & spel"
@@ -654,7 +655,7 @@ name = "Tradera"
 type = "http"
 urls = ["https://www.tradera.com/"]
 page = "https://www.tradera.com/"
-interval = 300
+interval = 900
 
 [source.http_svenskaspel]
 category = "Handla & spel"
@@ -662,7 +663,7 @@ name = "Svenska Spel"
 type = "http"
 urls = ["https://www.svenskaspel.se/"]
 page = "https://www.svenskaspel.se/"
-interval = 300
+interval = 900
 
 [source.http_atg]
 category = "Handla & spel"
@@ -670,7 +671,7 @@ name = "ATG"
 type = "http"
 urls = ["https://www.atg.se/"]
 page = "https://www.atg.se/"
-interval = 300
+interval = 900
 
 # ---------------- Ännu fler (nåbarhetskontroll) ----------------
 [source.http_avanza]
@@ -679,7 +680,7 @@ name = "Avanza"
 type = "http"
 urls = ["https://www.avanza.se/"]
 page = "https://www.avanza.se/"
-interval = 300
+interval = 900
 
 [source.http_nordnet]
 category = "Internetbanker"
@@ -687,7 +688,7 @@ name = "Nordnet"
 type = "http"
 urls = ["https://www.nordnet.se/"]
 page = "https://www.nordnet.se/"
-interval = 300
+interval = 900
 
 [source.http_sbab]
 category = "Internetbanker"
@@ -695,7 +696,7 @@ name = "SBAB"
 type = "http"
 urls = ["https://www.sbab.se/"]
 page = "https://www.sbab.se/"
-interval = 300
+interval = 900
 
 [source.http_skandia]
 category = "Internetbanker"
@@ -703,7 +704,7 @@ name = "Skandia"
 type = "http"
 urls = ["https://www.skandia.se/"]
 page = "https://www.skandia.se/"
-interval = 300
+interval = 900
 
 [source.http_sparbanken]
 category = "Internetbanker"
@@ -711,7 +712,7 @@ name = "Sparbanken Syd"
 type = "http"
 urls = ["https://www.sparbankensyd.se/"]
 page = "https://www.sparbankensyd.se/"
-interval = 300
+interval = 900
 
 [source.http_marginalen]
 category = "Internetbanker"
@@ -719,7 +720,7 @@ name = "Marginalen Bank"
 type = "http"
 urls = ["https://www.marginalen.se/"]
 page = "https://www.marginalen.se/"
-interval = 300
+interval = 900
 
 [source.http_resurs]
 category = "Internetbanker"
@@ -727,7 +728,7 @@ name = "Resurs Bank"
 type = "http"
 urls = ["https://www.resursbank.se/"]
 page = "https://www.resursbank.se/"
-interval = 300
+interval = 900
 
 [source.http_ikano]
 category = "Internetbanker"
@@ -735,7 +736,7 @@ name = "Ikano Bank"
 type = "http"
 urls = ["https://ikanobank.se/"]
 page = "https://ikanobank.se/"
-interval = 300
+interval = 900
 
 [source.http_svea]
 category = "Internetbanker"
@@ -743,7 +744,7 @@ name = "Svea Bank"
 type = "http"
 urls = ["https://www.svea.com/"]
 page = "https://www.svea.com/"
-interval = 300
+interval = 900
 
 [source.http_collector]
 category = "Internetbanker"
@@ -751,7 +752,7 @@ name = "Collector Bank"
 type = "http"
 urls = ["https://www.collector.se/"]
 page = "https://www.collector.se/"
-interval = 300
+interval = 900
 
 [source.http_lunar]
 category = "Internetbanker"
@@ -759,7 +760,7 @@ name = "Lunar"
 type = "http"
 urls = ["https://www.lunar.app/"]
 page = "https://www.lunar.app/"
-interval = 300
+interval = 900
 
 [source.http_northmill]
 category = "Internetbanker"
@@ -767,7 +768,7 @@ name = "Northmill"
 type = "http"
 urls = ["https://www.northmill.se/"]
 page = "https://www.northmill.se/"
-interval = 300
+interval = 900
 
 [source.http_hemnet]
 category = "Handla & spel"
@@ -775,7 +776,7 @@ name = "Hemnet"
 type = "http"
 urls = ["https://www.hemnet.se/"]
 page = "https://www.hemnet.se/"
-interval = 300
+interval = 900
 
 [source.http_amazon]
 category = "Handla & spel"
@@ -783,7 +784,7 @@ name = "Amazon.se"
 type = "http"
 urls = ["https://www.amazon.se/"]
 page = "https://www.amazon.se/"
-interval = 300
+interval = 900
 
 [source.http_adlibris]
 category = "Handla & spel"
@@ -791,7 +792,7 @@ name = "Adlibris"
 type = "http"
 urls = ["https://www.adlibris.com/"]
 page = "https://www.adlibris.com/"
-interval = 300
+interval = 900
 
 [source.http_bokus]
 category = "Handla & spel"
@@ -799,7 +800,7 @@ name = "Bokus"
 type = "http"
 urls = ["https://www.bokus.com/"]
 page = "https://www.bokus.com/"
-interval = 300
+interval = 900
 
 [source.http_prisjakt]
 category = "Handla & spel"
@@ -807,7 +808,7 @@ name = "Prisjakt"
 type = "http"
 urls = ["https://www.prisjakt.nu/"]
 page = "https://www.prisjakt.nu/"
-interval = 300
+interval = 900
 
 [source.http_postkod]
 category = "Handla & spel"
@@ -815,7 +816,7 @@ name = "Postkodlotteriet"
 type = "http"
 urls = ["https://www.postkodlotteriet.se/"]
 page = "https://www.postkodlotteriet.se/"
-interval = 300
+interval = 900
 
 [source.http_elgiganten]
 category = "Handla & spel"
@@ -823,7 +824,7 @@ name = "Elgiganten"
 type = "http"
 urls = ["https://www.elgiganten.se/"]
 page = "https://www.elgiganten.se/"
-interval = 300
+interval = 900
 
 [source.http_ikea]
 category = "Handla & spel"
@@ -831,7 +832,7 @@ name = "IKEA"
 type = "http"
 urls = ["https://www.ikea.com/se/"]
 page = "https://www.ikea.com/se/"
-interval = 300
+interval = 900
 
 [source.http_web1177]
 category = "Vardagsappar"
@@ -839,7 +840,7 @@ name = "1177.se (webbplats)"
 type = "http"
 urls = ["https://www.1177.se/"]
 page = "https://www.1177.se/"
-interval = 300
+interval = 900
 
 [source.http_outlook]
 category = "Vardagsappar"
@@ -847,7 +848,7 @@ name = "Outlook.com / Hotmail"
 type = "http"
 urls = ["https://outlook.live.com/"]
 page = "https://outlook.live.com/"
-interval = 300
+interval = 900
 
 # ---------------- Spel ----------------
 [source.twitch]
@@ -871,6 +872,7 @@ type = "xbox"
 country = "SE"
 page = "https://support.xbox.com/sv-SE/xbox-live-status"
 
+# Nåbarhetskontroller (type = "http") körs var 15:e minut (interval = 900).
 # Steam har ingen officiell statussida: vi kontrollerar själva att butiken och API:t svarar.
 [source.steam]
 category = "Spel"
@@ -878,6 +880,7 @@ name = "Steam"
 type = "http"
 urls = ["https://store.steampowered.com/", "https://api.steampowered.com/ISteamWebAPIUtil/GetServerInfo/v1/"]
 page = "https://steamstat.us/"
+interval = 900
 
 # ---------------- Banker & betalningar ----------------
 [source.freja]

@@ -501,26 +501,31 @@ def src_xbox(cfg: dict) -> list[Incident]:
 
 def src_http(cfg: dict) -> list[Incident]:
     """Egen nåbarhetskontroll när tjänsten saknar statussida. 3 försök innan larm."""
-    bad = []
+    bad, times = [], []
     for url in cfg["urls"]:
         err = ""
         for attempt in range(3):
+            t0 = time.time()
             try:
                 r = requests.get(url, headers=UA, timeout=15)
                 if r.status_code < 500:
                     err = ""
+                    times.append(time.time() - t0)
                     break
                 err = f"HTTP {r.status_code}"
             except requests.RequestException as ex:
-                err = type(ex).__name__
+                err = "timeout" if isinstance(ex, requests.Timeout) else "ingen anslutning"
             time.sleep(5)
         if err:
-            bad.append(f"{url} ({err})")
+            bad.append(f"`{url}` – {err} (3 försök)")
+    name = cfg.get("name", "")
     if not bad:
-        return [Incident(uid="reach", title=f"{cfg.get('name', '')} svarar igen", status="ok", resolved=True,
-                         severity="resolved", url=cfg.get("page", ""), updated="ok")]
-    return [Incident(uid="reach", title=f"{cfg.get('name', '')} svarar inte", status="nere", severity="major",
-                     url=cfg.get("page", ""), body="Kunde inte nå: " + ", ".join(bad), updated="down")]
+        ms = int(1000 * max(times)) if times else 0
+        return [Incident(uid="reach", title=f"{name} svarar igen", status="svarar", resolved=True,
+                         severity="resolved", url=cfg.get("page", ""), updated="ok",
+                         body=f"Svarstid: {ms} ms")]
+    return [Incident(uid="reach", title=f"{name} svarar inte", status="svarar inte", severity="major",
+                     url=cfg.get("page", ""), body="\n".join(bad), updated="down")]
 
 
 def src_meta(cfg: dict) -> list[Incident]:
@@ -624,6 +629,16 @@ SOURCES = {"link": src_link, "aws": src_aws, "inera": src_inera, "meta": src_met
 # ---------------------------------------------------------------- Discord
 
 def embed(provider: str, inc: Incident, is_new: bool) -> dict:
+    if inc.uid == "reach":  # egen nåbarhetskontroll - inte en officiell störning
+        return {
+            "title": f"📶 {inc.title}"[:256],
+            "description": (f"{inc.body}\n\n" if inc.body else "") +
+                           "*Egen nåbarhetskontroll – inte en officiell störningsrapport från tjänsten.*",
+            "color": 0x2ECC71 if inc.resolved else 0x9B59B6,
+            "url": inc.url if inc.url.startswith("http") else None,
+            "footer": {"text": f"statusbot • nåbarhet • {provider}"},
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
     prefix = "✅ Löst" if inc.resolved else ("🔴 Ny incident" if is_new else "🟠 Uppdatering")
     native = inc.uid == "page"  # driftsidor är redan på svenska
     title, body = (inc.title, inc.body) if native else (sv(inc.title), sv(inc.body))
@@ -760,6 +775,8 @@ def _svc_view(s: dict) -> tuple[str, str, int]:
     opn = s["open"]
     if s["failing"] and not opn:
         return "⚪", "Kunde inte kontrolleras", 0
+    if opn and s["type"] == "http":
+        return "📵", "Svarar inte", 3
     if opn:
         w = max(opn, key=lambda o: SEV_RANK.get(o["severity"], 2))
         lbl = "Underhåll" if w["severity"] == "maintenance" else f"{len(opn)} störning{'ar' if len(opn) > 1 else ''}"
@@ -769,14 +786,16 @@ def _svc_view(s: dict) -> tuple[str, str, int]:
     if not s["checked"]:
         return "⏳", "Väntar på första kontroll", 0
     if s["type"] == "http":
-        return "🟢", "Svarar (nåbarhetskontroll)", 0
+        return "🟢", "Svarar", 0
     return "🟢", "Fungerar", 0
 
 
-def overview_embeds(snap: dict, title: str = "📡 Driftstatus – översikt", cats_filter: list | None = None) -> list[dict]:
+def overview_embeds(snap: dict, title: str = "📡 Driftstatus – översikt", cats_filter: list | None = None,
+                    reach: bool | None = None) -> list[dict]:
     """Översikt + (om något krånglar) lista med länkar till varje pågående störning."""
     rows = [(s, *_svc_view(s)) for s in snap["services"]
-            if cats_filter is None or s["category"] in cats_filter]
+            if (cats_filter is None or s["category"] in cats_filter)
+            and (reach is None or (s["type"] == "http") == reach)]
     worst = max((r[3] for r in rows), default=0)
     bad = [r for r in rows if r[0]["open"]]
     colors = [0x2ECC71, 0x3498DB, 0xF1C40F, 0xE67E22, 0xE74C3C]
@@ -815,17 +834,20 @@ def overview_embeds(snap: dict, title: str = "📡 Driftstatus – översikt", c
     return out
 
 
-def _overview_groups(conf: dict, snap: dict) -> list[tuple[str, str, list | None]]:
+def _overview_groups(conf: dict, snap: dict) -> list[tuple[str, str, list | None, bool | None]]:
     groups = conf.get("discord", {}).get("overview_groups")
     if not groups:
-        return [("main", "📡 Driftstatus – översikt", None)]
+        return [("main", "📡 Driftstatus – översikt", None, None)]
     out, used = [], set()
     for i, g in enumerate(groups):
-        out.append((f"g{i}", g["title"], list(g["categories"])))
+        out.append((f"g{i}", g["title"], list(g["categories"]), False))
         used |= set(g["categories"])
     rest = sorted({s["category"] for s in snap["services"]} - used)
-    if rest:  # kategorier som inte nämns hamnar i sista gruppen
+    if rest:
         out[-1][2].extend(rest)
+    rt = conf.get("discord", {}).get("reach_title")
+    if rt:
+        out.append(("reach", rt, None, True))
     return out
 
 
@@ -835,8 +857,13 @@ def update_overview(webhook: str, conf: dict, state: dict) -> None:
     allov = state.setdefault("_overviews", {})
     if "_overview" in state and "g0" not in allov:   # migrera tidigare enda översikt till grupp 0
         allov["g0"] = state.pop("_overview")
-    for key, title, cats in _overview_groups(conf, snap):
-        embeds = overview_embeds(snap, title, cats)
+    if "g1" in allov and "reach" not in allov and len(conf.get("discord", {}).get("overview_groups", [])) == 1:
+        allov["reach"] = allov.pop("g1")              # återanvänd det andra fästa meddelandet för nåbarhet
+    for key, title, cats, reach in _overview_groups(conf, snap):
+        embeds = overview_embeds(snap, title, cats, reach)
+        if reach:
+            embeds[0]["footer"] = {"text": "🟢 svarar  📵 svarar inte  •  Egen kontroll var 15:e min (3 försök) – "
+                                           "inte officiella störningsrapporter"}
         sig = hashlib.sha1(json.dumps(embeds[0]["fields"][:-1] + embeds[1:], ensure_ascii=False).encode()).hexdigest()
         ov = allov.setdefault(key, {})
         if ov.get("sig") == sig and time.time() - ov.get("ts", 0) < 1800 and ov.get("msg"):
