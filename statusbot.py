@@ -768,7 +768,7 @@ def snapshot(conf: dict, state: dict) -> dict:
 
 SEV_ICON = {"critical": "🔴", "major": "🟠", "minor": "🟡", "info": "🟡", "maintenance": "🔧"}
 SEV_RANK = {"critical": 4, "major": 3, "minor": 2, "info": 2, "maintenance": 1}
-CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Vård & apotek", "Myndigheter", "Strömning & sociala medier", "Nyheter, radio & ljudböcker", "Handla & spel", "Spel", "Internetbanker", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
+CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Vård & apotek", "Myndigheter", "Pension & försäkring", "El & energi", "Mobiloperatörer", "Strömning & sociala medier", "Nyheter, radio & ljudböcker", "Handla & spel", "Spel", "Internetbanker", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
 
 
 def _svc_view(s: dict) -> tuple[str, str, int]:
@@ -864,7 +864,7 @@ def update_overview(webhook: str, conf: dict, state: dict) -> None:
         if reach:
             bad = sum(1 for x in snap["services"] if x["type"] == "http" and x["open"])
             embeds[0]["description"] = (f"**📵 {bad} tjänster svarar inte**" if bad else "**✅ Alla tjänster svarar**")
-            embeds[0]["footer"] = {"text": "🟢 svarar  📵 svarar inte  •  Egen kontroll var 15:e min (3 försök) – "
+            embeds[0]["footer"] = {"text": "🟢 svarar  📵 svarar inte  •  Egen kontroll var 10:e min (3 försök) – "
                                            "inte officiella störningsrapporter"}
         sig = hashlib.sha1(json.dumps(embeds[0]["fields"][:-1] + embeds[1:], ensure_ascii=False).encode()).hexdigest()
         ov = allov.setdefault(key, {})
