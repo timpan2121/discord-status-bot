@@ -724,7 +724,7 @@ def snapshot(conf: dict, state: dict) -> dict:
 
 SEV_ICON = {"critical": "🔴", "major": "🟠", "minor": "🟡", "info": "🟡", "maintenance": "🔧"}
 SEV_RANK = {"critical": 4, "major": 3, "minor": 2, "info": 2, "maintenance": 1}
-CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Spel", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
+CAT_ORDER = ["Microsoft", "Google", "Vardagsappar", "Strömning & sociala medier", "Spel", "Moln & infrastruktur", "Appar & tjänster", "Banker & betalningar", "Bredband (Sverige)"]
 
 
 def _svc_view(s: dict) -> tuple[str, str, int]:
@@ -739,6 +739,8 @@ def _svc_view(s: dict) -> tuple[str, str, int]:
         return "🔗", "Kolla driftkartan för din adress", 0
     if not s["checked"]:
         return "⏳", "Väntar på första kontroll", 0
+    if s["type"] == "http":
+        return "🟢", "Svarar (nåbarhetskontroll)", 0
     return "🟢", "Fungerar", 0
 
 
@@ -772,6 +774,13 @@ def overview_embeds(snap: dict) -> list[dict]:
             val = "\n".join(f"{SEV_ICON.get(o['severity'], '🟡')} {lnk(o['title'][:150], o['url'])}" for o in s["open"][:5])
             inc["fields"].append({"name": s["name"], "value": val[:1024], "inline": False})
         out.append(inc)
+    # Discord: max 6000 tecken totalt per meddelande - korta störningslistan vid behov
+    def size(es):
+        return sum(len(x.get("title", "")) + len(x.get("description", "")) + len(x.get("footer", {}).get("text", ""))
+                   + sum(len(f["name"]) + len(f["value"]) for f in x.get("fields", [])) for x in es)
+    while len(out) > 1 and size(out) > 5800 and out[1]["fields"]:
+        out[1]["fields"].pop()
+        out[1]["description"] = "…fler störningar finns, se länkarna i översikten ovan."
     return out
 
 

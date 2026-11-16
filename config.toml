@@ -281,6 +281,136 @@ type = "inera"
 match = ["1177 app", "1177 inkorg", "1177 inloggningsportal", "1177 journal", "1177 tidbokning", "1177 informationsportal", "1177 intyg", "1177 på telefon", "1177 symtombedömning"]
 page = "https://www.inera.se/driftstatus/"
 
+# ---------------- Strömning & sociala medier ----------------
+# Saknar öppna statussidor: boten kontrollerar själv att tjänsten svarar (fångar större avbrott).
+[source.http_netflix]
+category = "Strömning & sociala medier"
+name = "Netflix"
+type = "http"
+urls = ["https://www.netflix.com/"]
+page = "https://www.netflix.com/"
+interval = 300
+
+[source.http_youtube]
+category = "Strömning & sociala medier"
+name = "YouTube"
+type = "http"
+urls = ["https://www.youtube.com/"]
+page = "https://www.youtube.com/"
+interval = 300
+
+[source.http_disneyplus]
+category = "Strömning & sociala medier"
+name = "Disney+"
+type = "http"
+urls = ["https://www.disneyplus.com/"]
+page = "https://www.disneyplus.com/"
+interval = 300
+
+[source.http_viaplay]
+category = "Strömning & sociala medier"
+name = "Viaplay"
+type = "http"
+urls = ["https://www.viaplay.se/"]
+page = "https://www.viaplay.se/"
+interval = 300
+
+[source.http_max]
+category = "Strömning & sociala medier"
+name = "Max (HBO)"
+type = "http"
+urls = ["https://www.max.com/", "https://play.max.com/"]
+page = "https://www.max.com/"
+interval = 300
+
+[source.http_svtplay]
+category = "Strömning & sociala medier"
+name = "SVT Play"
+type = "http"
+urls = ["https://www.svtplay.se/"]
+page = "https://www.svtplay.se/"
+interval = 300
+
+[source.http_tv4play]
+category = "Strömning & sociala medier"
+name = "TV4 Play"
+type = "http"
+urls = ["https://www.tv4play.se/"]
+page = "https://www.tv4play.se/"
+interval = 300
+
+[source.http_spotify]
+category = "Strömning & sociala medier"
+name = "Spotify"
+type = "http"
+urls = ["https://open.spotify.com/", "https://api.spotify.com/v1/"]
+page = "https://open.spotify.com/"
+interval = 300
+
+[source.http_facebook]
+category = "Strömning & sociala medier"
+name = "Facebook"
+type = "http"
+urls = ["https://www.facebook.com/"]
+page = "https://www.facebook.com/"
+interval = 300
+
+[source.http_instagram]
+category = "Strömning & sociala medier"
+name = "Instagram"
+type = "http"
+urls = ["https://www.instagram.com/"]
+page = "https://www.instagram.com/"
+interval = 300
+
+[source.http_whatsapp]
+category = "Strömning & sociala medier"
+name = "WhatsApp"
+type = "http"
+urls = ["https://web.whatsapp.com/"]
+page = "https://web.whatsapp.com/"
+interval = 300
+
+[source.http_telegram]
+category = "Strömning & sociala medier"
+name = "Telegram"
+type = "http"
+urls = ["https://telegram.org/", "https://web.telegram.org/"]
+page = "https://telegram.org/"
+interval = 300
+
+[source.http_tiktok]
+category = "Strömning & sociala medier"
+name = "TikTok"
+type = "http"
+urls = ["https://www.tiktok.com/"]
+page = "https://www.tiktok.com/"
+interval = 300
+
+[source.http_snapchat]
+category = "Strömning & sociala medier"
+name = "Snapchat"
+type = "http"
+urls = ["https://www.snapchat.com/"]
+page = "https://www.snapchat.com/"
+interval = 300
+
+[source.http_kivra]
+category = "Vardagsappar"
+name = "Kivra"
+type = "http"
+urls = ["https://www.kivra.com/", "https://app.kivra.com/"]
+page = "https://www.kivra.com/"
+interval = 300
+
+[source.http_postnord]
+category = "Vardagsappar"
+name = "PostNord"
+type = "http"
+urls = ["https://www.postnord.se/"]
+page = "https://www.postnord.se/"
+interval = 300
+
 # ---------------- Spel ----------------
 [source.twitch]
 category = "Spel"
